@@ -1,5 +1,7 @@
 //% color=#0062dB weight=96 icon="\uf294" block="blockytalky BLE"
 namespace blockyTalkyBLE {
+    let delimiter = "^";
+    let terminator = "#";
     let handlers: LinkedKeyHandlerList = null;
 
     class LinkedKeyHandlerList {
@@ -21,7 +23,7 @@ namespace blockyTalkyBLE {
     //% mutate=objectdestructuring
     //% mutateText="My Arguments"
     //% mutateDefaults="key,stringValue"
-    //% blockId=on_string_recieved
+    //% blockId=blockyTalkyBLE_on_string_recieved
     //% block="on string received|key %theKey"
     export function onStringReceived(key: string, callback: (stringValue: TypeContainer) => void) {
         let newHandler = new LinkedKeyHandlerList()
@@ -35,7 +37,7 @@ namespace blockyTalkyBLE {
     //% mutate=objectdestructuring
     //% mutateText="My Arguments"
     //% mutateDefaults="key,numberValue"
-    //% blockId=on_number_received
+    //% blockId=blockyTalkyBLE_on_number_received
     //% block="on number received|key %theKey"
     export function onNumberReceived(key: string, callback: (numberValue: TypeContainer) => void) {
         let newHandler = new LinkedKeyHandlerList()
@@ -46,19 +48,19 @@ namespace blockyTalkyBLE {
         handlers = newHandler;
     }
 
-    //% blockId=send_string_key_value block="send string|key %key|value %value"
-    export function sendStringValue(key: string, value: string): void {
-        sendM(key, ValueTypeIndicator.String, value)
+    //% blockId=blockyTalkyBLE_send_string_key_value block="send string|key %key|value %value"
+    export function sendMessageWithStringValue(key: string, value: string): void {
+        sendRawMessage(key, ValueTypeIndicator.String, value)
     }
 
-    //% blockId=send_number_key_value block="send number|key %key|value %value"
-    export function sendNumberValue(key: string, value: number): void {
-        sendM(key, ValueTypeIndicator.Number, value.toString())
+    //% blockId=blockyTalkyBLE_send_number_key_value block="send number|key %key|value %value"
+    export function sendMessageWithNumberValue(key: string, value: number): void {
+        sendRawMessage(key, ValueTypeIndicator.Number, value.toString())
     }
 
-    function sendM(key: string, valueTypeIndicator: ValueTypeIndicator, value: string): void {
-        let indicatorAsng = getTypeIndicator(valueTypeIndicator);
-        bluetooth.uartWriteString(indicatorAsng + ^ + key + ^ + value +#)
+    function sendRawMessage(key: string, valueTypeIndicator: ValueTypeIndicator, value: string): void {
+        let indicatorAsString = getStringForValueTypeIndicator(valueTypeIndicator);
+        bluetooth.uartWriteString(indicatorAsString + delimiter + key + delimiter + value + terminator)
     }
 
     let splitString = (splitOnChar: string, input: string) => {
@@ -78,17 +80,44 @@ namespace blockyTalkyBLE {
       return result;
     }
 
+    /**
+     * Get string representation of enum.
+     */
+    function getStringForValueTypeIndicator(vti: ValueTypeIndicator) {
+        switch (vti) {
+            case ValueTypeIndicator.Number:
+                return "N"
+            case ValueTypeIndicator.String:
+                return "S"
+            default:
+                return "!"
+        }
+    }
+
+    /**
+     * Get enum representation of string.
+     */
+    function getValueTypeIndicatorForString(typeString: string) {
+        switch (typeString) {
+            case "S":
+                return ValueTypeIndicator.String
+            case "N":
+                return ValueTypeIndicator.Number
+            default:
+                return null
+        }
+    }
 
     /**
      * Handles any incoming message
      */
     export function handleIncomingUARTData() {
-        let latestM = bluetooth.uartReadUntil(#)
-        let mArray = splitString(^, latestM)
+        let latestMessage = bluetooth.uartReadUntil(terminator)
+        let messageArray = splitString(delimiter, latestMessage)
 
-        let type = getValueType (mArray[0])
-        let key = mArray[1]
-        let val = mArray[2]
+        let type = getValueTypeIndicatorForString(messageArray[0])
+        let key = messageArray[1]
+        let val = messageArray[2]
 
         if (type === ValueTypeIndicator.Number) {
             messageContainer.numberValue = parseInt(val)
@@ -98,14 +127,17 @@ namespace blockyTalkyBLE {
             messageContainer.stringValue = val
         }
 
-        let check = handlers;
+        let handlerToExamine = handlers;
 
+        if (handlerToExamine == null) { //empty handler list
+            basic.showString("nohandler")
+        }
 
-        while (check != null) {
-            if (check.key == key && check.type == type) {
-                check.callback(messageContainer)
+        while (handlerToExamine != null) {
+            if (handlerToExamine.key == key && handlerToExamine.type == type) {
+                handlerToExamine.callback(messageContainer)
             }
-            check = check.next
+            handlerToExamine = handlerToExamine.next
         }
     }
 
