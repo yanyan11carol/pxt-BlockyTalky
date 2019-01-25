@@ -47,18 +47,18 @@ namespace blockyTalkyBLE {
     }
 
     //% blockId=send_string_key_value block="send string|key %key|value %value"
-    export function sendMessageWithStringValue(key: string, value: string): void {
+    export function sendStringValue(key: string, value: string): void {
         sendM(key, ValueTypeIndicator.String, value)
     }
 
     //% blockId=send_number_key_value block="send number|key %key|value %value"
-    export function sendMessageWithNumberValue(key: string, value: number): void {
+    export function sendNumberValue(key: string, value: number): void {
         sendM(key, ValueTypeIndicator.Number, value.toString())
     }
 
     function sendM(key: string, valueTypeIndicator: ValueTypeIndicator, value: string): void {
-        let indicatorAsString = getTypeIndicator(valueTypeIndicator);
-        bluetooth.uartWriteString(indicatorAsString + ^ + key + ^ + value +#)
+        let indicatorAsng = getTypeIndicator(valueTypeIndicator);
+        bluetooth.uartWriteString(indicatorAsng + ^ + key + ^ + value +#)
     }
 
     let splitString = (splitOnChar: string, input: string) => {
@@ -78,33 +78,6 @@ namespace blockyTalkyBLE {
       return result;
     }
 
-    /**
-     * Get string representation of enum.
-     */
-    function getTypeIndicator(vti: ValueTypeIndicator) {
-        switch (vti) {
-            case ValueTypeIndicator.Number:
-                return "N"
-            case ValueTypeIndicator.String:
-                return "S"
-            default:
-                return "!"
-        }
-    }
-
-    /**
-     * Get enum representation of string.
-     */
-    function getValueType (typeString: string) {
-        switch (typeString) {
-            case "S":
-                return ValueTypeIndicator.String
-            case "N":
-                return ValueTypeIndicator.Number
-            default:
-                return null
-        }
-    }
 
     /**
      * Handles any incoming message
