@@ -1,3 +1,6 @@
+//% weight=0 color=#3CB371 icon="\uf2db" block="sensors"
+namespace sensors {
+
 //% color=#0062dB weight=96 icon="\uf294" block="blockytalky BLE"
 namespace blockyTalkyBLE {
     let delimiter = "^";
