@@ -1,0 +1,17 @@
+{
+    "name": "blockyTalkyBLE",
+    "version": "0.0.9",
+    "description": "uses BLE UART",
+    "license": "MIT",
+    "dependencies": {
+        "core": "*",
+        "bluetooth": "*"
+    },
+    "files": [
+        "README.md",
+        "blockyTalkyBLE.ts"
+    ],
+    
+   
+    "public": true
+}

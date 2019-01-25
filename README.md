@@ -1,1 +1,5 @@
-# pxt-blockytalky
+# BlockyTalkyBLE
+
+## Supported targets
+
+* for PXT/microbit
