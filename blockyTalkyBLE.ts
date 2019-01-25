@@ -1,18 +1,22 @@
-//% color=#0fbc11 icon="\uf121"
-namespace tinkercademy {
-    
-    enum ADKeys {
-    A = 1,
-    B = 2,
-    C = 3,
-    D = 4,
-    E = 5
-}
+ 
+//% color=#0062dB weight=96 icon="\uf294" block="blockytalky BLE"
+namespace blockyTalkyBLE {
+    let delimiter = "^";
+    let terminator = "#";
+    let handlers: LinkedKeyHandlerList = null;
 
-enum OnOff {
-    Off = 0,
-    On = 1
-}
+    enum ADKeys {
+        A = 1,
+        B = 2,
+        C = 3,
+        D = 4,
+        E = 5
+    }
+
+    enum OnOff {
+        Off = 0,
+        On = 1
+    }
 
         let crashSensorPin: DigitalPin;
     /**
@@ -93,14 +97,10 @@ enum OnOff {
     }
 
     
+     
     
     
-//% color=#0062dB weight=96 icon="\uf294" block="blockytalky BLE"
-namespace blockyTalkyBLE {
-    let delimiter = "^";
-    let terminator = "#";
-    let handlers: LinkedKeyHandlerList = null;
-
+    
     class LinkedKeyHandlerList {
         key: string;
         type: ValueTypeIndicator;
@@ -130,7 +130,7 @@ namespace blockyTalkyBLE {
         newHandler.next = handlers;
         handlers = newHandler;
      }
-}
+
 
     //% mutate=objectdestructuring
     //% mutateText="My Arguments"
@@ -227,9 +227,6 @@ namespace blockyTalkyBLE {
 
         let handlerToExamine = handlers;
 
-        if (handlerToExamine == null) { //empty handler list
-            basic.showString("nohandler")
-        }
 
         while (handlerToExamine != null) {
             if (handlerToExamine.key == key && handlerToExamine.type == type) {
